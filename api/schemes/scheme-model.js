@@ -92,20 +92,19 @@ async function  findById(scheme_id) { // EXERCISE B
       }
   */
 
-  const rows = await('schemes as sc')
+  const rows = await db('schemes as sc')
     .where('sc.scheme_id', scheme_id)
     .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
     .select('st.*', 'sc.scheme_name', 'sc.scheme_id')
-    .orderBy('st.step_number', 
-    'asc')
+    .orderBy('st.step_number', 'asc')
 
   const result = {
     scheme_id: rows[0].scheme_id,
     scheme_name: rows[0].scheme_name,
-    steps: []
+    steps: [],
   }
 
-  rows.forEach(row => {
+  rows.forEach((row) => {
     if (row.step_id) {
       result.steps.push({
         step_id: row.step_id,
@@ -159,12 +158,7 @@ function add(scheme) { // EXERCISE D
  })
 }
 
-function addStep(scheme_id, step) { // EXERCISE E
-  /*
-    1E- This function adds a step to the scheme with the given `scheme_id`
-    and resolves to _all the steps_ belonging to the given `scheme_id`,
-    including the newly created one.
-  */
+function addStep(scheme_id, step) { 
 
     return db('steps').insert({
       ...step,
@@ -173,9 +167,10 @@ function addStep(scheme_id, step) { // EXERCISE E
     .then(() => {
       return db('steps as st')
       .join('schemes as sc', 'sc.scheme_id', 'st.scheme_id')
+      .where('st.scheme_id', scheme_id)
       .select('step_id', 'step_number', 'instructions', 'scheme_name')
-      .orderBy('step_number')
-      .where('scheme_id', scheme_id)
+      .orderBy('step_number', 'asc')
+      
     })
 }
 

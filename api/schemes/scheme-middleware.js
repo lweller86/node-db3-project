@@ -11,20 +11,22 @@ const db = require('../../data/db-config')
 */
 const checkSchemeId = async (req, res, next) => {
   try {
-    const scheme = await db('scheme').where('scheme_id', req.params.scheme_id)
-    if (!scheme) {
+    const existing = await db('schemes')
+      .where('scheme_id', req.params.scheme_id)
+      .first();
+
+    if (!existing) {
       next({
         status: 404,
-        message: "scheme with scheme_id <actual id> not found",
-      })
+        message: `scheme with scheme_id ${req.params.scheme_id} not found`,
+      });
     } else {
-      req.scheme = scheme
       next()
     }
   } catch (err) {
     next(err)
   }
-}
+};
 
 /*
   If `scheme_name` is missing, empty string or not a string:
@@ -67,14 +69,19 @@ const validateStep = (req, res, next) => {
     instructions === undefined ||
     typeof instructions !== 'string' ||
     !instructions.trim() ||
+    step_number === undefined ||
     typeof step_number !== 'number' ||
+    step_number == isNaN ||
     step_number < 1
   ) {
-    const error = { status: 400 }
-    error.message = 'invalid step'
+    next({
+      status: 400 ,
+    message: 'invalid step'
+    })
+  } else {
+    next()
   }
-
-}
+};
 
 module.exports = {
   checkSchemeId,

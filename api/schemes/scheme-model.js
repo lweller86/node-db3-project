@@ -93,10 +93,11 @@ async function  findById(scheme_id) { // EXERCISE B
   */
 
   const rows = await('schemes as sc')
-    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
     .where('sc.scheme_id', scheme_id)
+    .leftJoin('steps as st', 'sc.scheme_id', 'st.scheme_id')
     .select('st.*', 'sc.scheme_name', 'sc.scheme_id')
-    .orderBy('st.step_number')
+    .orderBy('st.step_number', 
+    'asc')
 
   const result = {
     scheme_id: rows[0].scheme_id,
